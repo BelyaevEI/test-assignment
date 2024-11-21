@@ -6,13 +6,17 @@ import (
 
 	"github.com/BelyaevEI/test-assignment/internal/api/auth"
 	"github.com/BelyaevEI/test-assignment/internal/config"
+	authRepo "github.com/BelyaevEI/test-assignment/internal/repository/auth"
+	authService "github.com/BelyaevEI/test-assignment/internal/service/auth"
 )
 
 type serviceProvider struct {
 	pgConfig   config.PGConfig
 	grpcConfig config.GRPCConfig
 
-	authImpl *auth.Implementation
+	authImpl       *auth.Implementation
+	authService    authService.AuthService
+	authRepository authRepo.AuthRepository
 }
 
 func newServiceProvider() *serviceProvider {
@@ -22,10 +26,28 @@ func newServiceProvider() *serviceProvider {
 // AuthImlp - implementation auth api layer
 func (s *serviceProvider) AuthImpl(ctx context.Context) *auth.Implementation {
 	if s.authImpl == nil {
-		s.authImpl = auth.NewImplementation()
+		s.authImpl = auth.NewImplementation(s.AuthService(ctx))
 	}
 
 	return s.authImpl
+}
+
+// AuthService - implementation service layer
+func (s *serviceProvider) AuthService(ctx context.Context) authService.AuthService {
+	if s.authService == nil {
+		s.authService = authService.NewService(s.AuthRepository(ctx))
+	}
+
+	return s.authService
+}
+
+// AuthRepositiry - implementation repository layer
+func (s *serviceProvider) AuthRepository(ctx context.Context) authRepo.AuthRepository {
+	if s.authRepository == nil {
+		s.authRepository = authRepo.NewRepository(ctx)
+	}
+
+	return s.authRepository
 }
 
 // GRPCConfig reading from enviroment variables in structure

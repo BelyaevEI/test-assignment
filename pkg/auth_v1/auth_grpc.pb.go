@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthV1Client interface {
-	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	Login(ctx context.Context, in *RegistrationRequest, opts ...grpc.CallOption) (*RegistrationResponse, error)
 }
 
 type authV1Client struct {
@@ -37,9 +37,9 @@ func NewAuthV1Client(cc grpc.ClientConnInterface) AuthV1Client {
 	return &authV1Client{cc}
 }
 
-func (c *authV1Client) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+func (c *authV1Client) Login(ctx context.Context, in *RegistrationRequest, opts ...grpc.CallOption) (*RegistrationResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LoginResponse)
+	out := new(RegistrationResponse)
 	err := c.cc.Invoke(ctx, AuthV1_Login_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (c *authV1Client) Login(ctx context.Context, in *LoginRequest, opts ...grpc
 // All implementations must embed UnimplementedAuthV1Server
 // for forward compatibility
 type AuthV1Server interface {
-	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	Login(context.Context, *RegistrationRequest) (*RegistrationResponse, error)
 	mustEmbedUnimplementedAuthV1Server()
 }
 
@@ -59,7 +59,7 @@ type AuthV1Server interface {
 type UnimplementedAuthV1Server struct {
 }
 
-func (UnimplementedAuthV1Server) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
+func (UnimplementedAuthV1Server) Login(context.Context, *RegistrationRequest) (*RegistrationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedAuthV1Server) mustEmbedUnimplementedAuthV1Server() {}
@@ -76,7 +76,7 @@ func RegisterAuthV1Server(s grpc.ServiceRegistrar, srv AuthV1Server) {
 }
 
 func _AuthV1_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LoginRequest)
+	in := new(RegistrationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func _AuthV1_Login_Handler(srv interface{}, ctx context.Context, dec func(interf
 		FullMethod: AuthV1_Login_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthV1Server).Login(ctx, req.(*LoginRequest))
+		return srv.(AuthV1Server).Login(ctx, req.(*RegistrationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

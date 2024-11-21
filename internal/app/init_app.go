@@ -25,6 +25,7 @@ func (a *App) initDependens(ctx context.Context) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -53,5 +54,6 @@ func (a *App) initConfig(_ context.Context) error {
 // Inititalizating entity service provider
 func (a *App) initServiceProvider(_ context.Context) error {
 	a.serviceProvider = newServiceProvider()
+
 	return nil
 }
