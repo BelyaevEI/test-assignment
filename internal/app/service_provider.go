@@ -13,6 +13,7 @@ import (
 type serviceProvider struct {
 	pgConfig   config.PGConfig
 	grpcConfig config.GRPCConfig
+	logLevel   config.LoggerConfig
 
 	authImpl       *auth.Implementation
 	authService    authService.AuthService
@@ -44,7 +45,7 @@ func (s *serviceProvider) AuthService(ctx context.Context) authService.AuthServi
 // AuthRepositiry - implementation repository layer
 func (s *serviceProvider) AuthRepository(ctx context.Context) authRepo.AuthRepository {
 	if s.authRepository == nil {
-		s.authRepository = authRepo.NewRepository(ctx)
+		s.authRepository = authRepo.NewRepository(ctx, s.pgConfig.DSN())
 	}
 
 	return s.authRepository
@@ -76,4 +77,18 @@ func (s *serviceProvider) PGConfig() config.PGConfig {
 	}
 
 	return s.pgConfig
+}
+
+// Read log level config
+func (s *serviceProvider) LogLevel() config.LoggerConfig {
+	if s.logLevel == nil {
+		cfg, err := config.NewLoggerConfig()
+		if err != nil {
+			log.Fatalf("failed to ger log level config: %s", err.Error())
+		}
+
+		s.logLevel = cfg
+	}
+
+	return s.logLevel
 }

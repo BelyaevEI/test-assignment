@@ -4,9 +4,13 @@ go 1.23.3
 
 require google.golang.org/grpc v1.68.0
 
+require go.uber.org/multierr v1.10.0 // indirect
+
 require (
 	github.com/BelyaevEI/platform_common v0.0.0-20240812112204-197a13d460e9
 	github.com/joho/godotenv v1.5.1
+	github.com/natefinch/lumberjack v2.0.0+incompatible
+	go.uber.org/zap v1.27.0
 	golang.org/x/net v0.31.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect
 	golang.org/x/text v0.20.0 // indirect

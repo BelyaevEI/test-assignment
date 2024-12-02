@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/BelyaevEI/test-assignment/internal/config"
+	"github.com/BelyaevEI/test-assignment/internal/logger"
 	descAuth "github.com/BelyaevEI/test-assignment/pkg/auth_v1"
 
 	"google.golang.org/grpc"
@@ -17,6 +18,7 @@ func (a *App) initDependens(ctx context.Context) error {
 		a.initConfig,
 		a.initServiceProvider,
 		a.initGRPCServer,
+		a.initLogger,
 	}
 
 	for _, f := range inits {
@@ -35,7 +37,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 	reflection.Register(a.grpcServer)
 
-	//start initializating conteiner
+	//start initializating DI - conteiner
 	descAuth.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.AuthImpl(ctx))
 
 	return nil
@@ -54,6 +56,13 @@ func (a *App) initConfig(_ context.Context) error {
 // Inititalizating entity service provider
 func (a *App) initServiceProvider(_ context.Context) error {
 	a.serviceProvider = newServiceProvider()
+
+	return nil
+}
+
+// initLogger initialization entity logger
+func (a *App) initLogger(_ context.Context) error {
+	logger.Init(logger.GetCore(logger.GetAtomicLevel(a.serviceProvider.logLevel.Level())))
 
 	return nil
 }

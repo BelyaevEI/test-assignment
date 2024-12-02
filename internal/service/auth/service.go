@@ -9,7 +9,8 @@ import (
 
 // AuthService represents a service for auth entities.
 type AuthService interface {
-	Login(ctx context.Context, userLogin *model.UserRegistration) (string, error)
+	Login(ctx context.Context, userLogin *model.UserLogin) (string, error)
+	Registration(ctx context.Context, userRegistration *model.UserRegistration) (string, error)
 }
 
 type serv struct {
