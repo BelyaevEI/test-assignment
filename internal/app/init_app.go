@@ -15,10 +15,9 @@ import (
 // Calls all dependences application
 func (a *App) initDependens(ctx context.Context) error {
 	inits := []func(context.Context) error{
-		a.initConfig,
 		a.initServiceProvider,
-		a.initGRPCServer,
 		a.initLogger,
+		a.initGRPCServer,
 	}
 
 	for _, f := range inits {
@@ -43,26 +42,21 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	return nil
 }
 
-// Initializating config for application dependences
-func (a *App) initConfig(_ context.Context) error {
-	err := config.Load(configPath)
+// Inititalizating entity service provider
+func (a *App) initServiceProvider(_ context.Context) error {
+
+	cfg, err := config.Load("./config.env")
 	if err != nil {
 		return err
 	}
-
-	return nil
-}
-
-// Inititalizating entity service provider
-func (a *App) initServiceProvider(_ context.Context) error {
-	a.serviceProvider = newServiceProvider()
+	a.serviceProvider = newServiceProvider(cfg)
 
 	return nil
 }
 
 // initLogger initialization entity logger
 func (a *App) initLogger(_ context.Context) error {
-	logger.Init(logger.GetCore(logger.GetAtomicLevel(a.serviceProvider.logLevel.Level())))
+	logger.Init(logger.GetCore(logger.GetAtomicLevel(a.serviceProvider.config.LogLevel())))
 
 	return nil
 }

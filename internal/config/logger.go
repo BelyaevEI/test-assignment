@@ -17,7 +17,7 @@ type loggerConfig struct {
 	logLevel string
 }
 
-func NewLoggerConfig() (LoggerConfig, error) {
+func parseLogLevelenv() (*loggerConfig, error) {
 	logLevel := os.Getenv(logLevelEnvName)
 	if len(logLevel) == 0 {
 		return nil, errors.New("log level not found")
@@ -28,6 +28,6 @@ func NewLoggerConfig() (LoggerConfig, error) {
 	}, nil
 }
 
-func (c *loggerConfig) Level() string {
-	return c.logLevel
+func (c *config) LogLevel() string {
+	return c.loglevel
 }

@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log"
 
 	"github.com/BelyaevEI/test-assignment/internal/api/auth"
 	"github.com/BelyaevEI/test-assignment/internal/config"
@@ -11,17 +10,14 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig   config.PGConfig
-	grpcConfig config.GRPCConfig
-	logLevel   config.LoggerConfig
-
+	config         config.Config
 	authImpl       *auth.Implementation
 	authService    authService.AuthService
 	authRepository authRepo.AuthRepository
 }
 
-func newServiceProvider() *serviceProvider {
-	return &serviceProvider{}
+func newServiceProvider(cfg config.Config) *serviceProvider {
+	return &serviceProvider{config: cfg}
 }
 
 // AuthImlp - implementation auth api layer
@@ -45,50 +41,8 @@ func (s *serviceProvider) AuthService(ctx context.Context) authService.AuthServi
 // AuthRepositiry - implementation repository layer
 func (s *serviceProvider) AuthRepository(ctx context.Context) authRepo.AuthRepository {
 	if s.authRepository == nil {
-		s.authRepository = authRepo.NewRepository(ctx, s.pgConfig.DSN())
+		s.authRepository = authRepo.NewRepository(ctx, s.config.DSN())
 	}
 
 	return s.authRepository
-}
-
-// GRPCConfig reading from enviroment variables in structure
-func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
-	if s.grpcConfig == nil {
-		cfg, err := config.NewGRPCConfig()
-		if err != nil {
-			log.Fatalf("failed to get grpc config: %s", err.Error())
-		}
-
-		s.grpcConfig = cfg
-	}
-
-	return s.grpcConfig
-}
-
-// Read postgres config
-func (s *serviceProvider) PGConfig() config.PGConfig {
-	if s.pgConfig == nil {
-		cfg, err := config.NewPGConfig()
-		if err != nil {
-			log.Fatalf("failed to get pg config: %s", err.Error())
-		}
-
-		s.pgConfig = cfg
-	}
-
-	return s.pgConfig
-}
-
-// Read log level config
-func (s *serviceProvider) LogLevel() config.LoggerConfig {
-	if s.logLevel == nil {
-		cfg, err := config.NewLoggerConfig()
-		if err != nil {
-			log.Fatalf("failed to ger log level config: %s", err.Error())
-		}
-
-		s.logLevel = cfg
-	}
-
-	return s.logLevel
 }

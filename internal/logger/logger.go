@@ -69,6 +69,7 @@ func GetCore(level zap.AtomicLevel) zapcore.Core {
 
 func GetAtomicLevel(logLevel string) zap.AtomicLevel {
 	var level zapcore.Level
+
 	if err := level.Set(logLevel); err != nil {
 		log.Fatalf("failed to set log level: %v", err)
 	}

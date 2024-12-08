@@ -2,25 +2,16 @@ package app
 
 import (
 	"context"
-	"flag"
-	"log"
+	"fmt"
 	"net"
-	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 
 	"github.com/BelyaevEI/platform_common/pkg/closer"
+	initutils "github.com/BelyaevEI/test-assignment/internal/init_utils"
+	"github.com/BelyaevEI/test-assignment/internal/logger"
 
 	"google.golang.org/grpc"
 )
-
-var configPath string
-
-func init() {
-	configPath = os.Getenv("CONFIG_PATH")
-	flag.Parse()
-}
 
 // App represents the app
 type App struct {
@@ -58,38 +49,19 @@ func (a *App) Run(ctx context.Context) error {
 
 		err := a.runGRPCServer()
 		if err != nil {
-			log.Fatalf("failed to run grpc server: %v", err)
+			logger.Error(fmt.Sprintf("failed to run grpc server: %v", err))
 		}
 
 	}()
 
-	gracefulShutdown(ctx, cancel, wg)
+	initutils.GracefulShutdown(ctx, cancel, wg)
 	return nil
-}
-
-func gracefulShutdown(ctx context.Context, cancel context.CancelFunc, wg *sync.WaitGroup) {
-
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-
-	select {
-	case <-ctx.Done():
-		log.Println("terminating: context cancelled")
-	case <-sig:
-		log.Println("terminating: via signal")
-	}
-
-	cancel()
-	if wg != nil {
-		wg.Wait()
-	}
 }
 
 // Start listen grpc server
 func (a *App) runGRPCServer() error {
-	log.Printf("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Addres())
-
-	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Addres())
+	logger.Info(fmt.Sprintf("GRPC server is running on %s", a.serviceProvider.config.AddresGRPC()))
+	list, err := net.Listen("tcp", a.serviceProvider.config.AddresGRPC())
 	if err != nil {
 		return err
 	}
