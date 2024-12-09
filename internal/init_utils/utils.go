@@ -25,5 +25,4 @@ func GracefulShutdown(ctx context.Context, cancel context.CancelFunc, wg *sync.W
 	if wg != nil {
 		wg.Wait()
 	}
-
 }
